@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:${POSTGRES_TAG}
+    environment:
+      POSTGRES_INITDB_ARGS: --auth-host=md5
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ../db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+      - ./custom_pg_hba.conf:/usr/share/postgresql/17/pg_hba.conf.sample
+      - ./custom_postgresql.conf:/usr/share/postgresql/17/postgresql.conf.sample
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]
+      timeout: ${DB_HEALTHCHECK_TIMEOUT}
+      interval: ${DB_HEALTHCHECK_INTERVAL}
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge
+volumes:
+  pgdata:
