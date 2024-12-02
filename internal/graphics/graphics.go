@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/jung-kurt/gofpdf"
+	"image/color"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,7 +32,8 @@ func NewAppManager(s *services.Service) *AppManager {
 
 func (m *AppManager) Run() {
 	application := app.New()
-	mainWindow := application.NewWindow("Shop Management System v.0.0")
+	application.Settings().SetTheme(&CustomTheme{})
+	mainWindow := application.NewWindow("Shop Management System v.0.0.0")
 	mainWindow.Resize(fyne.NewSize(300, 300))
 
 	m.ShowLoginScreen(mainWindow)
@@ -38,7 +41,7 @@ func (m *AppManager) Run() {
 	mainWindow.ShowAndRun()
 }
 
-// Login Screen
+// ShowLoginScreen shows login screen window to user
 func (m *AppManager) ShowLoginScreen(window fyne.Window) {
 	usernameEntry := widget.NewEntry()
 	usernameEntry.SetPlaceHolder("Username")
@@ -48,7 +51,9 @@ func (m *AppManager) ShowLoginScreen(window fyne.Window) {
 
 	errorLabel := widget.NewLabel("")
 
-	loginButton := widget.NewButton("Login", func() {
+	background := canvas.NewRectangle(color.RGBA{R: 220, G: 220, B: 255, A: 255})
+
+	loginButton := NewSquareButton("Login", func() {
 		username := usernameEntry.Text
 		password := passwordEntry.Text
 
@@ -63,16 +68,16 @@ func (m *AppManager) ShowLoginScreen(window fyne.Window) {
 		m.showRegisterScreen(window)
 	})
 
-	form := container.NewVBox(
-		widget.NewLabel("Authorization"),
-		usernameEntry,
-		passwordEntry,
-		loginButton,
-		registerButton,
-		errorLabel,
-	)
-
-	window.SetContent(form)
+	window.SetContent(container.NewStack(
+		background,
+		container.NewVBox(
+			widget.NewLabel("Authorization"),
+			usernameEntry,
+			passwordEntry,
+			loginButton,
+			registerButton,
+			errorLabel,
+		)))
 }
 
 // Register Screen
