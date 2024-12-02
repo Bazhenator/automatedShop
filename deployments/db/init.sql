@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS "charges"
     CONSTRAINT fk_charges_expense_items
         FOREIGN KEY (expense_item_id)
             REFERENCES "expense_items" (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "sales"
@@ -41,4 +42,5 @@ CREATE TABLE IF NOT EXISTS "sales"
     CONSTRAINT fk_sales_warehouses
         FOREIGN KEY (warehouses_id)
             REFERENCES "warehouses" (id)
+        ON DELETE CASCADE
 );

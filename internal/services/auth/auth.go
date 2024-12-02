@@ -4,6 +4,7 @@ import (
 	customErr "automatedShop/internal/errors"
 	"automatedShop/internal/repository"
 	"context"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
@@ -60,6 +61,11 @@ func (s *AuthService) RegisterUser(ctx context.Context, login string, pass strin
 	passHash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	user, err := s.AuthRepo.FindUser(ctx, login)
+	if user != nil {
+		return errors.New("user already exists in system")
 	}
 
 	err = s.AuthRepo.SaveUser(ctx, login, passHash)

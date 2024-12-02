@@ -53,7 +53,7 @@ func (m *AppManager) ShowLoginScreen(window fyne.Window) {
 		password := passwordEntry.Text
 
 		if m.AuthService.AuthoriseUser(context.Background(), username, password) {
-			m.showMainScreen(window)
+			m.showMainScreen(window, username)
 		} else {
 			errorLabel.SetText("Invalid username or password")
 		}
@@ -97,11 +97,16 @@ func (m *AppManager) showRegisterScreen(window fyne.Window) {
 		}
 	})
 
+	exitButton := widget.NewButton("Back", func() {
+		m.ShowLoginScreen(window)
+	})
+
 	form := container.NewVBox(
 		widget.NewLabel("Register"),
 		usernameEntry,
 		passwordEntry,
 		registerButton,
+		exitButton,
 		errorLabel,
 	)
 
@@ -109,7 +114,9 @@ func (m *AppManager) showRegisterScreen(window fyne.Window) {
 }
 
 // Main Screen
-func (m *AppManager) showMainScreen(window fyne.Window) {
+func (m *AppManager) showMainScreen(window fyne.Window, loginEntry string) {
+	loginLabel := widget.NewLabelWithStyle(loginEntry, fyne.TextAlignTrailing, fyne.TextStyle{Bold: true})
+
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Handbooks", m.showHandbooksScreen(window)),
 		container.NewTabItem("Journals", m.showJournalsScreen(window)),
@@ -120,7 +127,7 @@ func (m *AppManager) showMainScreen(window fyne.Window) {
 		m.ShowLoginScreen(window)
 	})
 
-	mainLayout := container.NewBorder(nil, exitButton, nil, nil, tabs)
+	mainLayout := container.NewBorder(loginLabel, exitButton, nil, nil, tabs)
 	window.SetContent(mainLayout)
 }
 
@@ -208,7 +215,7 @@ func (m *AppManager) showWarehousesTable(window fyne.Window) {
 	})
 
 	exitButton := widget.NewButton("Back", func() {
-		m.showMainScreen(window)
+		m.showMainScreen(window, "")
 	})
 
 	// Расположение кнопок внизу
@@ -405,7 +412,7 @@ func (m *AppManager) showExpenseItemsTable(window fyne.Window) {
 	})
 
 	exitButton := widget.NewButton("Back", func() {
-		m.showMainScreen(window)
+		m.showMainScreen(window, "")
 	})
 
 	// Расположение кнопок внизу
@@ -594,7 +601,7 @@ func (m *AppManager) showChargesTable(window fyne.Window) {
 	})
 
 	exitButton := widget.NewButton("Back", func() {
-		m.showMainScreen(window)
+		m.showMainScreen(window, "")
 	})
 
 	// Расположение кнопок внизу
@@ -800,7 +807,7 @@ func (m *AppManager) showSalesTable(window fyne.Window) {
 	})
 
 	exitButton := widget.NewButton("Back", func() {
-		m.showMainScreen(window)
+		m.showMainScreen(window, "")
 	})
 
 	// Расположение кнопок внизу
@@ -1037,7 +1044,7 @@ func (m *AppManager) showBestItems(window fyne.Window) {
 				})
 
 				exitButton := widget.NewButton("Back", func() {
-					m.showMainScreen(window)
+					m.showMainScreen(window, "")
 				})
 
 				// Нижняя панель с кнопками
