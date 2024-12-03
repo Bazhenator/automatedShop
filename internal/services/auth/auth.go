@@ -35,17 +35,17 @@ func (s *AuthService) AuthoriseUser(ctx context.Context, login string, pwd strin
 
 	user, err := s.AuthRepo.FindUser(ctx, login)
 	if err != nil {
-		fmt.Printf("error occurred in: %v: %v", op, err)
+		fmt.Printf("error occurred in: %v: %v\n", op, err)
 		return false
 	}
 
 	if err = bcrypt.CompareHashAndPassword(user.PassHash, []byte(pwd)); err != nil {
-		fmt.Printf("error occurred in: %v: %v", op, err)
+		fmt.Printf("error occurred in: %v: %v\n", op, err)
 
 		return false
 	}
 
-	fmt.Printf("%v: user logged in successfully!", op)
+	fmt.Printf("%v: user logged in successfully!\n", op)
 	return true
 }
 
@@ -63,9 +63,9 @@ func (s *AuthService) RegisterUser(ctx context.Context, login string, pass strin
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	user, err := s.AuthRepo.FindUser(ctx, login)
-	if user != nil {
-		return errors.New("user already exists in system")
+	_, err = s.AuthRepo.FindUser(ctx, login)
+	if err == nil {
+		return errors.New("user already exists")
 	}
 
 	err = s.AuthRepo.SaveUser(ctx, login, passHash)
